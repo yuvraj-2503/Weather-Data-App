@@ -1,6 +1,5 @@
 *.iml
 .gradle
-app/src/main/java/Config.kt
 /local.properties
 /.idea/caches
 /.idea/libraries
