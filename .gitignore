@@ -1,6 +1,6 @@
 *.iml
 .gradle
-app/src/main/java/com.example.weatherdataapp/Config.kt
+app/src/main/java/Config.kt
 /local.properties
 /.idea/caches
 /.idea/libraries
