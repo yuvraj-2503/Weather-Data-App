@@ -3,6 +3,8 @@ package com.example.weatherdataapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -10,11 +12,13 @@ import android.location.LocationManager
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import com.android.volley.Request
 import com.android.volley.Response
@@ -56,6 +60,16 @@ class MainActivity : AppCompatActivity() {
 
     fun getCurrentLocation(){
         mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val dialog= AlertDialog.Builder(this, R.style.Base_Theme_MaterialComponents_Dialog)
+        dialog.setTitle("Location Access Needed")
+        dialog.setMessage("Please turn on your location to proceed :)")
+        dialog.setPositiveButton("OK"){ text,listener ->
+            val intent= Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(intent)
+        }
+        dialog.setNegativeButton("CLOSE"){ text, listener ->
+            finishAffinity()
+        }
         mLocationListener = object : LocationListener{
             override fun onLocationChanged(location: Location) {
                 val latitude = location.latitude
@@ -72,13 +86,35 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onProviderEnabled(provider: String) {
-                super.onProviderEnabled(provider)
+
             }
 
             override fun onProviderDisabled(provider: String) {
-                super.onProviderDisabled(provider)
+                dialog.create()
+                dialog.show()
             }
         }
+
+        if(!ConnectionManager().checkConnectivity(this)){
+            val dialog2= AlertDialog.Builder(this, R.style.Base_Theme_MaterialComponents_Dialog)
+            dialog2.setTitle("No Internet")
+            dialog2.setMessage("Please turn on your network connection to proceed..")
+            dialog2.setPositiveButton("OK"){ text,listener ->
+                val intent= Intent(Settings.ACTION_WIRELESS_SETTINGS)
+                startActivity(intent)
+            }
+            dialog2.setNegativeButton("CLOSE"){ text, listener ->
+                finishAffinity()
+            }
+            dialog2.create()
+            dialog2.show()
+        }
+
+//        if(!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//
+//            dialog.create()
+//            dialog.show()
+//        }
 
         if (ActivityCompat.checkSelfPermission(
                 this,
